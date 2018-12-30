@@ -1,25 +1,104 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Person from "./Person/Person";
+import newClasses from './App.module.css';
+import './Person/Person.css';
 
 class App extends Component {
+
+  state = {
+    persons : [
+      {id : 'perone', name : 'Prafull Gaikwad', age: 28},
+      {id : 'pertwo', name : "Manisha Shelke", age : 27},
+      {id : 'perthree', name: 'Namrata Palkar', age : 25}
+    ],
+    showPerson : false,
+    buttonState : 'Show'
+  }
+
+  deletePersonHandler = (personIndex) => {
+    const persons = this.state.persons;
+    persons.splice(personIndex, 1);
+    this.setState({persons: persons});
+  }
+
+  nameChangeHandler = (event, id) => {
+
+
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
+
+    console.log(personIndex);
+    const person = {
+      ...this.state.persons[personIndex]
+    };
+
+    // const person = Object.assign({}, this.state.persons[personIndex]);
+
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState( {persons: persons} );
+
+  }
+
+  togglePersonHandler = () =>{
+    const doesShow = this.state.showPerson;
+    let newButtonState = 'Show';
+    doesShow ? newButtonState = 'Show' : newButtonState = 'Hide';
+    this.setState({showPerson : !doesShow,
+                  buttonState : newButtonState});
+
+  }
+
   render() {
+
+    const style = {
+      backgroundColor: 'green',
+      font: 'inherit',
+      border: '1px solid blue',
+      padding:'8px',
+      cursor : 'pointer'
+    };
+
+    let persons = null;
+    if(this.state.showPerson){
+      persons = (
+        <div>
+          {this.state.persons.map((persons, index) => {
+              return (<Person 
+                click={() => this.deletePersonHandler(index)}
+                name={persons.name} 
+                age={persons.age} 
+                nameChange ={(event) => this.nameChangeHandler(event, persons.id)}
+                key={persons.id}
+                />)
+          })}
+        </div>
+      )
+      
+      style.backgroundColor = 'red';
+    }
+
+    let classes = [];
+    if(this.state.persons.length <= 2){
+      classes.push(newClasses.red);
+    }
+
+    if(this.state.persons.length <= 1){
+      classes.push(newClasses.bold);
+    }
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className={newClasses.App}>
+       <h1>Hallo, I`am React App</h1>
+       <p className={classes.join(' ')}> This is really working!!</p>
+       <button
+       style={style} 
+       onClick={() => this.togglePersonHandler()}>{this.state.buttonState} Person</button>
+        {persons}
       </div>
     );
   }
